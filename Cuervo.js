@@ -11,9 +11,8 @@ async function iniciar() {
     browser: ["Cuervo-Bot", "Chrome", "1.0"] 
   })
 
-  // ESTO ES LO NUEVO PARA CÓDIGO
   if (!sock.authState.creds.registered) {
-    const numero = "526462106206" // <-- CAMBIA ESTE NUMERO POR EL TUYO
+    const numero = "5216462106206"
     console.log(`Pidiendo código para ${numero}...`)
     setTimeout(async () => {
       try {
@@ -26,7 +25,7 @@ TU CÓDIGO ES: ${code}
 Ve a WhatsApp > Dispositivos vinculados > Vincular con número
 `)
       } catch (e) {
-        console.log("Error:", e.message)
+        console.log("Error al pedir código:", e.message)
       }
     }, 3000)
   }
