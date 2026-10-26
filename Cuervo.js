@@ -1,34 +1,48 @@
 const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys')
-const qrcode = require('qrcode-terminal')
+const P = require('pino')
 
 async function iniciar() {
   const { state, saveCreds } = await useMultiFileAuthState('cuervo_auth')
-  const sock = makeWASocket({ auth: state, printQRInTerminal: false })
+  
+  const sock = makeWASocket({ 
+    auth: state, 
+    logger: P({ level: 'silent' }),
+    printQRInTerminal: false,
+    browser: ["Cuervo-Bot", "Chrome", "1.0"] 
+  })
+
+  // ESTO ES LO NUEVO PARA CÓDIGO
+  if (!sock.authState.creds.registered) {
+    const numero = "5216641234567" // <-- CAMBIA ESTE NUMERO POR EL TUYO
+    console.log(`Pidiendo código para ${numero}...`)
+    setTimeout(async () => {
+      try {
+        let code = await sock.requestPairingCode(numero)
+        code = code?.match(/.{1,4}/g)?.join("-") || code
+        console.log(`
+
+TU CÓDIGO ES: ${code}
+
+Ve a WhatsApp > Dispositivos vinculados > Vincular con número
+`)
+      } catch (e) {
+        console.log("Error:", e.message)
+      }
+    }, 3000)
+  }
 
   sock.ev.on('creds.update', saveCreds)
-  
+
   sock.ev.on('connection.update', (update) => {
-    const { qr, connection } = update
-    if (qr) {
-      console.log('ESCANEA ESTE QR:')
-      qrcode.generate(qr, { small: true })
-    }
+    const { connection } = update
     if (connection === 'open') {
       console.log('CUERVO CONECTADO 🐦‍⬛')
     }
-  })
-
-  sock.ev.on('messages.upsert', async m => {
-    const msg = m.messages[0]
-    if (!msg.message || msg.key.fromMe) return
-    const texto = (msg.message.conversation || msg.message.extendedTextMessage?.text || "").toLowerCase()
-    const jid = msg.key.remoteJid
-    if (texto === "!cuervo") {
-      await sock.sendMessage(jid, { text: "Cuervo activo we 🐦‍⬛🔥" })
-    }
-    if (texto === "!rola") {
-      await sock.sendMessage(jid, { text: "🐦‍⬛ Te pone: Slayer - Raining Blood 🤘" })
+    if (connection === 'close') {
+      console.log('Conexión cerrada, reintentando...')
+      iniciar()
     }
   })
 }
+
 iniciar()
