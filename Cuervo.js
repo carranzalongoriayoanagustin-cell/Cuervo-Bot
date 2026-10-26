@@ -12,7 +12,7 @@ async function iniciar() {
   })
 
   if (!sock.authState.creds.registered) {
-    const numero = "5216462106206"
+    const numero = "526462106206"
     console.log(`Pidiendo código para ${numero}...`)
     setTimeout(async () => {
       try {
