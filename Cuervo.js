@@ -13,7 +13,7 @@ async function iniciar() {
 
   // ESTO ES LO NUEVO PARA CÓDIGO
   if (!sock.authState.creds.registered) {
-    const numero = "5216641234567" // <-- CAMBIA ESTE NUMERO POR EL TUYO
+    const numero = "526462106206" // <-- CAMBIA ESTE NUMERO POR EL TUYO
     console.log(`Pidiendo código para ${numero}...`)
     setTimeout(async () => {
       try {
